@@ -181,12 +181,14 @@ def __compress_calls(data=[]):
     return calls_expanded
 
 def main(argv):
-    calls = ['call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2', 'call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2']
+    calls = [
+        'call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2', \
+        'call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2'
+    ]
+
     print(calls)
     compressed_calls = __compress_calls(calls)
     print(compressed_calls)
 
-
 if __name__ == "__main__": 
     sys.exit(main(sys.argv))
-
