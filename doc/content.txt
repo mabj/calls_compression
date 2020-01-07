@@ -71,7 +71,7 @@ The compressed output has the following propeties:
 Next sessions describes two methods to reach the compression exemplified above. The first uses Sufix Trees [REFERENCE] and non-overlapping Longest Repeated Subset [REFERENCE] and the second one uses N-Gram [REFERENCE].
 [OK]
 
-[Method 001 - Non-Overlapping Longest Repeated Substring]
+[Method 001: Non-Overlapping Longest Repeated Substring]
 
 The first method consists in using Non-Overlaping Longest Repeated Substring which is a well stablished algorithm of complexity O(n^2) [REFERENCE]. This algorithm will find repeated subsets of tokens which are composed by a checksum of data extracted from each entry in the log - this will be the Identifier of an API call setup.
 
@@ -315,8 +315,8 @@ The code below is a Python implementation of the logic described above.
 The output to the example above is:
 
 ### [OUTPUT_SNIP_03]
-    ['call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2', 'call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2']
-    [{'label': 'call_0', 'repeated': 2}, {'label': 'call_1', 'repeated': 2}, {'label': 'call_2', 'repeated': 8}]
+1    ['call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2', 'call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2']
+2    [{'label': 'call_0', 'repeated': 2}, {'label': 'call_1', 'repeated': 2}, {'label': 'call_2', 'repeated': 8}]
 ###
 
 Initial log entries (line 1) were compressed (line 2) and the information of repetition was appended. This method is example was just a simulation of how a possible library implementing this method could be applied in a real scenario for compressing behavioural logs.
@@ -330,22 +330,17 @@ This method can be used in a scenario with many small/medium size log files and 
 
 These limitations pushed this research to experimenting other approaches in order to get better efficiency. Since the log files are relativelly big and loops usually perform small and concise block of operations so the full coverage (to all sizes of looping body) is not really necessary. 
 
-[Method 002 - N-Grams]
+[Method 002: N-Grams]
 
 
 
 
+
+
+[REFERENCES]
 
 [1] https://en.wikipedia.org/wiki/Longest_repeated_substring_problem
 [2] https://www.geeksforgeeks.org/longest-repeating-and-non-overlapping-substring/
 [3] https://lijiyao111.gitbooks.io/algorithm-and-data-structure/Array_DP/LongestRepeatingSubstring.html
 
 
-[CONTRIBUTIONS]
-
-[N-Grams]
-The N-gram approach is more suitable to what we need and can handle inline compression without using much memory.
-
-The output for this script is exactly what we expected and the entries for calls 2 and 3 were grouped:
-
-[GIST]
