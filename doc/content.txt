@@ -314,7 +314,7 @@ The code below is a Python implementation of the logic described above.
 
 The output to the example above is:
 
-### [OUTPUT_SNIP_03]
+### [SNIP_03_OUTPUT]
 1    ['call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2', 'call_0', 'call_1', 'call_2', 'call_2', 'call_2', 'call_2']
 2    [{'label': 'call_0', 'repeated': 2}, {'label': 'call_1', 'repeated': 2}, {'label': 'call_2', 'repeated': 8}]
 ###
@@ -336,39 +336,145 @@ N-Gram is a contiguous sequence of "n" items from a given sample [REFERENCE]. Th
 The following python like pseudo-code shows the idea described in this section:
 
 ### [PSEUDO_002]
-compressors = []
-for i in range(1,level):
-    compressors.append(Compressor(i))
-
-for e in data:
-    c = compressors[0]
-    out = c.add(e)
-    for c in compressor[1:]:
-        out = c.add(out)
+1     compressors = []
+2     for i in range(1,level):
+3         compressors.append(Compressor(i))
+4
+5     for e in data:
+6         e1 = checksum(e)
+7         c = compressors[0]
+8         out = c.add(e1)
+9         for c in compressor[1:]:
+10            out = c.add(out)
 ###
+
+This algorithm first pre-initialize a list of compressors (this component will be better explained later) using the above mentioned "compressor level" parameter. This loop creates multiple compressors containing N-Gram with N ranging from 1 to a positive integer passed as parameter ("i" on line 3). 
+
+The loop listed from lines 5 to 10 connects compressors. Elements are added to the smallest compressor and its output is added to the next one in line with it. This cycle repeats until the algorithm reachs the last compressor.
 
 ### [PSEUDO_003]
     class Compressor:
-        init(level):
+        def init(level):
             buffer = List(level*2)
 
-        add():
+        def add(element):
+            tmp = None
+            if not element:
+                return tmp
+
+            if len(buffer) == level*2:
+                tmp = buffer.pop(0)
+            
+            buffer.append(element)
+
+            analyse()
+            return tmp
+
+        def analyse():
             if buffer[0:half] == buffer[half:]:
                 update_counters()
                 buffer = buffer[0:half]
 
-        update_counters():
+        def update_counters():
             for i in range(0:level):
                 buffer[i].counter += buffer[i+level].counter
 ###
 
+A buffer in a compressor acts like a queue (first in first out) of size equal to "level" times 2. This buffer is incremented and if buffer is full an analysis is executed. This analysis simply checks if the first half of buffer is the same as the second. If the answer to this check is positive then the buffer is compressed elminating the repetition. 
 
+The following code is a Python implementation of the method described in this section.
 
+### [SNIP_04]
+class NGram:
+    def __init__(self, order):
+        self.order = order
+        self.buffer = []
 
+    def add(self, element):
+        tmp = None
+        if not element:
+            return tmp
 
+        if len(self.buffer) == self.order * 2:
+            tmp = self.buffer.pop(0)
 
+        if type(element) == list:
+            self.buffer.append(element)
+        else:
+            self.buffer.append([element, 1])
 
+        self.analyse()
+        return tmp
 
+    def analyse(self):
+        tmp = [c[0] for c in self.buffer]
+        if tmp[0:self.order] == tmp[self.order:]:
+            for i in range(self.order):
+                self.buffer[i][1] += self.buffer[i+self.order][1]
+            self.buffer = self.buffer[0:self.order]
+
+class Compressor:
+    def __init__(self, level):
+        self.level  = level
+        self.ngrams = [ NGram(i) for i in range(1,level+1) ]
+        self.final  = []
+
+    def add(self, element):
+        head, tail = (self.ngrams[0], self.ngrams[1:])
+        out = head.add(element)
+
+        for t in tail:
+            out = t.add(out)
+
+        if out:
+            self.final.append(out)
+
+    def flush(self):
+        for i in range(len(self.ngrams)):
+            current_buffer = self.ngrams[i].buffer
+            for out in current_buffer:
+                for u in range(i+1, len(self.ngrams)):
+                    out = self.ngrams[u].add(out)
+                if out:
+                    self.final.append(out)
+
+if __name__ == '__main__':
+    import logging
+    LOGGING_FORMAT = '[%(levelname)s] [%(asctime)s] %(funcName)s(): %(message)s'
+    logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
+    logger = logging.getLogger()
+
+    t0 = [ 
+        '0', '1', '2', '2', '2', '2', \
+        '0', '1', '2', '2', '2', '2'
+    ]
+    comp = Compressor(5)
+
+    logger.info('[+] Original buffer: {}'.format(t0))
+
+    for c in t0:
+        comp.add(c)
+    comp.flush()
+
+    logger.info('[+] Compressed list: {}'.format(comp.final))
+    size_before = len(t0)
+    size_after = len(comp.final)
+    logger.info('[+] Compression rate: {:.2f}%'.format(100.0 - (size_after * 100 / size_before)))
+###
+
+The next snip shows the output of the code above.
+
+### [SNIP_04_OUTPUT]
+[INFO] [2020-01-08 16:37:03,477] <module>(): [+] Original buffer: ['0', '1', '2', '2', '2', '2', '0', '1', '2', '2', '2', '2']
+[INFO] [2020-01-08 16:37:03,477] <module>(): [+] Compressed list: [['0', 2], ['1', 2], ['2', 8]]
+[INFO] [2020-01-08 16:37:03,477] <module>(): [+] Compression rate: 75.00%
+###
+
+This approach is able to detect loop patterns and compresses them dynamically (inline) without using big chunks of memory. This algorithm is more suitable to the task analysed in this research of detecting loops and compressing behavioural logs.
+
+[OUTCOME]
+
+The second method 
 
 [REFERENCES]
 [1] https://en.wikipedia.org/wiki/Longest_repeated_substring_problem
