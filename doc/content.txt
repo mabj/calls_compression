@@ -347,10 +347,6 @@ for e in data:
         out = c.add(out)
 ###
 
-
-
-
-
 ### [PSEUDO_003]
     class Compressor:
         init(level):
