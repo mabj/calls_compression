@@ -330,7 +330,44 @@ This method can be used in a scenario with many small/medium size log files and 
 
 These limitations pushed this research to experimenting other approaches in order to get better efficiency. Since the log files are relativelly big and loops usually perform small and concise block of operations so the full coverage (to all sizes of looping body) is not really necessary. 
 
-[Method 002: N-Grams]
+[Method 002: N-Gram]
+N-Gram is a contiguous sequence of "n" items from a given sample [REFERENCE]. This concept can be used to represent loop blocks of "n" size to the problem tackled in this research. Since average loop content is not really big, the proposed solution in this section can be bounded according to a parameter. We called this parameter as "Compressor Level" and it holds the maximum size to a loop body (repeated pattern). This parameter determines how many pattern detectors it will create to patterns with size varying from 1 to "Compressor Level".
+
+The following python like pseudo-code shows the idea described in this section:
+
+### [PSEUDO_002]
+compressors = []
+for i in range(1,level):
+    compressors.append(Compressor(i))
+
+for e in data:
+    c = compressors[0]
+    out = c.add(e)
+    for c in compressor[1:]:
+        out = c.add(out)
+###
+
+
+
+
+
+### [PSEUDO_003]
+    class Compressor:
+        init(level):
+            buffer = List(level*2)
+
+        add():
+            if buffer[0:half] == buffer[half:]:
+                update_counters()
+                buffer = buffer[0:half]
+
+        update_counters():
+            for i in range(0:level):
+                buffer[i].counter += buffer[i+level].counter
+###
+
+
+
 
 
 
@@ -338,9 +375,7 @@ These limitations pushed this research to experimenting other approaches in orde
 
 
 [REFERENCES]
-
 [1] https://en.wikipedia.org/wiki/Longest_repeated_substring_problem
 [2] https://www.geeksforgeeks.org/longest-repeating-and-non-overlapping-substring/
 [3] https://lijiyao111.gitbooks.io/algorithm-and-data-structure/Array_DP/LongestRepeatingSubstring.html
-
-
+[4] https://en.wikipedia.org/wiki/N-gram
