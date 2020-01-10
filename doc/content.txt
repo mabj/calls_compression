@@ -53,7 +53,7 @@ The body of the loop statement (line "2") executes "5" times functions "002" and
 
 An entry containing a position ("line[x]") and an identifier ("c_00[x]") to a call is added to this output everytime a function is executed. Taking a closer look to this log it is possible to observe repetition pattern from lines 2 to 14. These lines present an execution trace of the loop and could be compressed to the following form:
 
-### [OUTPUT_SNIP_01 COMPRESSED]
+### [OUTPUT_SNIP_01_COMPRESSED]
 1    (line1, c_001)
 2    (line3, c_002) x5
 3    (line4, c_003) x5
@@ -474,7 +474,7 @@ This approach is able to detect loop patterns and compresses them dynamically (i
 
 [OUTCOME]
 
-The second method 
+
 
 [REFERENCES]
 [1] https://en.wikipedia.org/wiki/Longest_repeated_substring_problem
